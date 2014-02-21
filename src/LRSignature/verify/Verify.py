@@ -18,16 +18,19 @@ Created on May 9, 2011
 @author: jklo
 '''
 from gnupg import GPG
-from LRSignature.sign.Sign import Sign_0_21
-from LRSignature.errors import *
+from ..sign.Sign import *
+from ..errors import *
 import types, re, copy, os, sys
 import cStringIO
 
-class Verify_0_21(Sign_0_21):
-    '''
-    classdocs
-    '''
+from abc import ABCMeta
 
+
+class VerifyBase(SignBase):
+    __metaclass__ = ABCMeta
+    '''
+    Base class for verifying signatures
+    '''
 
     def __init__(self, gpgbin="/usr/local/bin/gpg", gnupgHome=os.path.expanduser(os.path.join("~", ".gnupg"))):
         '''
@@ -35,15 +38,15 @@ class Verify_0_21(Sign_0_21):
         '''
         self.gnupgHome = gnupgHome
         self.gpgbin = gpgbin
-        Sign_0_21.__init__(self, privateKeyID=None, passphrase=None, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin, publicKeyLocations=[])
-        
-    
+        SignBase.__init__(self, privateKeyID=None, passphrase=None, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin, publicKeyLocations=[])
+
+
     def _getSignatureInfo(self, envelope={}):
             sigInfo = None
-            
+
             if envelope.has_key("digital_signature"):
                 sigInfo = envelope["digital_signature"]
-                if sigInfo.has_key("signing_method"): 
+                if sigInfo.has_key("signing_method"):
                     if sigInfo["signing_method"] == self.signatureMethod:
                         if not sigInfo.has_key("signature") or sigInfo["signature"] == None or len(sigInfo["signature"]) == 0:
                             raise BadSignatureFormat(MISSING_SIGNATURE)
@@ -55,12 +58,12 @@ class Verify_0_21(Sign_0_21):
                         raise UnsupportedSignatureAlgorithm(sigInfo["signing_method"])
                 else:
                     raise UnsupportedSignatureAlgorithm(None)
-            
-            
+
+
             return sigInfo
-    
+
     def _extractHashFromSignature(self, signatureBlock=""):
-        
+
         def removeHead(mesg=[]):
             status = 0
             mcopy = copy.deepcopy(mesg)
@@ -71,12 +74,12 @@ class Verify_0_21(Sign_0_21):
                     status = 2
                 elif (status == 1 or status == 2) and line == "":
                     status = 3
-                
+
                 mcopy.pop(0)
-                
+
                 if status == 3:
                     break
-                
+
             return mcopy
 
         def removeTail(mesg=[]):
@@ -86,36 +89,36 @@ class Verify_0_21(Sign_0_21):
                     break
                 msgOnly += line
             return msgOnly
-        
-        if sys.version_info > (2, 7): 
+
+        if sys.version_info > (2, 7):
             sig = re.split("\r\n|\r|\n", signatureBlock, flags=re.MULTILINE)
         else:
             sig = re.split("\r\n|\r|\n", signatureBlock)
-            
+
         hash = removeTail(removeHead(sig))
-        
+
         return hash
-        
+
     def get_and_verify(self, envelope):
         '''
         Get the OpenPGP validation info and Verify integrity of the provided envelope.
-        
-        Returns: 
+
+        Returns:
             None if no signature block exists
-            gnupg.Verify object if signature & integrity check pass        
+            gnupg.Verify object if signature & integrity check pass
         Raises:
             BadSignatureFormat if signature & integrity check do not pass
             MissingPublicKey if public key for signed document is missing
         '''
-        
+
         sigInfo = self._getSignatureInfo(envelope)
-        
+
         if sigInfo != None:
 
             verified = self.gpg.verify(sigInfo["signature"])
             if verified.valid == True:
                 verifiedHash = self._extractHashFromSignature(sigInfo["signature"])
-                
+
                 if self.get_message(envelope) == verifiedHash:
                     return verified
                 else:
@@ -129,24 +132,24 @@ class Verify_0_21(Sign_0_21):
     def verify(self, envelope):
         '''
         Verify integrity of the provided envelope.
-        
-        Returns: 
+
+        Returns:
             None if no signature block exists
             True if signature & integrity check pass
             False if signature & integrity check do not pass
-        
+
         Raises:
             MissingPublicKey if public key for signed document is missing
         '''
-        
+
         sigInfo = self._getSignatureInfo(envelope)
-        
+
         if sigInfo != None:
 
             verified = self.gpg.verify(sigInfo["signature"])
             if verified.valid == True:
                 verifiedHash = self._extractHashFromSignature(sigInfo["signature"])
-                
+
                 if self.get_message(envelope) == verifiedHash:
                     return True
                 else:
@@ -157,7 +160,21 @@ class Verify_0_21(Sign_0_21):
                 return False
         return None
 
+
+class Verify_0_21(Sign_0_21, VerifyBase):
+    pass
+
+class Verify_0_23(Sign_0_23, VerifyBase):
+    pass
+
+class Verify_0_49(Sign_0_49, VerifyBase):
+    pass
+
+class Verify_0_51(Sign_0_51, VerifyBase):
+    pass
+
+
 if __name__ == "__main__":
     verify = Verify_0_21()
     pass
-        
+

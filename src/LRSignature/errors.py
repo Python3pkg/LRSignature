@@ -18,6 +18,11 @@ Created on May 6, 2011
 @author: jklo
 '''
 
+class SignatureException(Exception):
+    def __init__(self, message=None):
+        Exception.__init__(self)
+        self.message = message
+
 class UnknownKeyException(Exception):
     '''
     Exception to be thrown when a key is not found in local keyring.
@@ -69,11 +74,14 @@ class MissingPublicKey(Exception):
         self.keyid = keyid
 
 
-class InvalidPassphrase(Exception):
+class InvalidPassphrase(SignatureException):
     '''
     Exception to be raised when an invalid passphrase is provided for key
     '''
-    def __init__(self, message=None):
-        Exception.__init__(self)
-        self.message = message
+    pass
 
+class IncompatibleDocumentVersion(SignatureException):
+    '''
+    Exception to be raised when a document does not have a compatible version for the signer
+    '''
+    pass

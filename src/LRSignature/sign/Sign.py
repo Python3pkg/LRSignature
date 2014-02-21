@@ -22,17 +22,23 @@ import hashlib
 import gnupg
 import types
 import os, copy
-from ..errors import UnknownKeyException, InvalidPassphrase
+from ..errors import UnknownKeyException, InvalidPassphrase, IncompatibleDocumentVersion
 from ..bencode import bencode
+from abc import ABCMeta
 
 def _cmp_version(version1, version2):
     def normalize(v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(version1), normalize(version2))
 
-class Sign_0_21(object):
+class SignBase(object):
+    __meta_class__ = ABCMeta
+    signatureMethod = "LR-PGP.1.0"
+    min_doc_version = "0.21.0"
+
+
     '''
-    Class for signing LR envelopes following version 0.21.0 of the LR Specification:
+    Base class for signing LR envelopes following version 0.21.0 of the LR Specification:
         see: https://docs.google.com/document/d/191BTary350To_4JokBUFZLFRMOEfGYrl_EHE6QZxUr8/edit
     '''
 
@@ -40,13 +46,11 @@ class Sign_0_21(object):
         '''
         Constructor
         '''
-        self.signatureMethod = "LR-PGP.1.0"
         self.privateKeyID = privateKeyID
         self.passphrase = passphrase
         self.gnupgHome = gnupgHome
         self.gpgbin = gpgbin
         self.publicKeyLocations = publicKeyLocations
-        self.min_doc_version = "0.21.0"
         self.sign_everything = sign_everything
 
         self.gpg = gnupg.GPG(gnupghome=self.gnupgHome, gpgbinary=self.gpgbin)
@@ -71,7 +75,12 @@ class Sign_0_21(object):
                 raise UnknownKeyException(self.privateKeyID)
 
     def _version_check(self, doc):
-        return _cmp_version(doc["doc_version"], self.min_doc_version) >= 0
+        if _cmp_version(doc["doc_version"], self.min_doc_version) < 0:
+            raise IncompatibleDocumentVersion(
+                "Document version of %s found, looking for %s or greater" % (doc["doc_version"], self.min_doc_version)
+            )
+
+        return True
 
     def _bnormal(self, obj = {}):
             if isinstance(obj, types.NoneType):
@@ -168,26 +177,48 @@ class Sign_0_21(object):
         '''
         Hashes and Signs a LR envelope according to the version 2.0 LR Specification
         '''
-        if self._version_check(envelope) or self.sign_everything:
-            msg = self.get_message(envelope)
 
-            signPrefs = {
-                         "keyid": self.privateKeyID,
-                         "passphrase": self.passphrase,
-                         "clearsign": True
-                    }
+        # check version compatibility
+        try:
+            self._version_check(envelope)
+        except IncompatibleDocumentVersion as ex:
+            # raise IncompatibleDocumentVersion
+            if not self.sign_everything:
+                raise ex
 
-            result = self.gpg.sign(msg, **signPrefs)
+        msg = self.get_message(envelope)
 
-            if result.data == '':
-                raise InvalidPassphrase('The passphrase provided is incorrect')
+        signPrefs = {
+                     "keyid": self.privateKeyID,
+                     "passphrase": self.passphrase,
+                     "clearsign": True
+                }
+
+        result = self.gpg.sign(msg, **signPrefs)
+
+        if result.data == '':
+            raise InvalidPassphrase('The passphrase provided is incorrect')
 
 
-            envelope["digital_signature"] = self._get_sig_block(result.data)
+        envelope["digital_signature"] = self._get_sig_block(result.data)
 
         return envelope
 
 
+
+# Alias classes to align with specification versions
+
+class Sign_0_21(SignBase):
+    min_doc_version = "0.21.0"
+
+class Sign_0_23(SignBase):
+    min_doc_version = "0.21.0"
+
+class Sign_0_49(SignBase):
+    min_doc_version = "0.49.0"
+
+class Sign_0_51(SignBase):
+    min_doc_version = "0.51.0"
 
 
 if __name__ == "__main__":

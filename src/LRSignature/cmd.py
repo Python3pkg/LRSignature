@@ -5,6 +5,7 @@ Created on Jun 14, 2011
 '''
 import types
 import sys
+from .errors import SignatureException
 
 class InvalidJSONError(ValueError):
     def __init__(self, msg):
@@ -21,8 +22,8 @@ class PipeTool(object):
 
 
     def run(self):
-        from sign.Sign import Sign_0_21
-        from LRSignature.verify.Verify import Verify_0_21
+        from sign.Sign import Sign_0_21 as Signer
+        from verify.Verify import Verify_0_21 as Verifier
 
         import json
 
@@ -30,14 +31,18 @@ class PipeTool(object):
         envelopeList = self.parseInput(rawInput)
 
         if self.args.mode == "sign":
-            self.signtool = Sign_0_21(privateKeyID=self.args.key,
+            self.signtool = Signer(privateKeyID=self.args.key,
                               passphrase=self.args.passphrase,
                               gnupgHome=self.args.gnupghome,
-                              gpgbin=self.args.gpgbin, publicKeyLocations=self.args.key_location)
+                              gpgbin=self.args.gpgbin, publicKeyLocations=self.args.key_location, sign_everything=False)
 
             is_test_data_opt = self.args.lr_test_data.lower() in ["true", "yes", "t", "y"]
 
-            signedList = self.signEnvelopes(envelopeList, is_test_data=is_test_data_opt)
+            try:
+                signedList = self.signEnvelopes(envelopeList, is_test_data=is_test_data_opt)
+            except SignatureException as ex:
+                sys.stderr.write("ERROR: "+ex.message+"\n")
+                exit(1)
 
             if self.args.publish_url != None:
                 self.publishEnvelopes(signedList)
@@ -45,7 +50,7 @@ class PipeTool(object):
                 print json.dumps({ "documents": signedList })
 
         elif self.args.mode == "verify":
-            self.verifytool = Verify_0_21(gpgbin=self.args.gpgbin, gnupgHome=self.args.gnupghome)
+            self.verifytool = Verifier(gpgbin=self.args.gpgbin, gnupgHome=self.args.gnupghome)
             resultList = self.validateEnvelopes(envelopeList)
             print json.dumps({"results": resultList})
 
