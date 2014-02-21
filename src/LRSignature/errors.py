@@ -18,28 +18,28 @@ Created on May 6, 2011
 @author: jklo
 '''
 
-class SignatureException(Exception):
-    def __init__(self, message=None):
-        Exception.__init__(self)
-        self.message = message
-
-class UnknownKeyException(Exception):
-    '''
-    Exception to be thrown when a key is not found in local keyring.
-    '''
-
-    def __init__(self, keyid):
-        '''
-        Constructor
-        '''
-        Exception.__init__(self)
-        self.keyid = keyid
 
 MISSING_SIGNATURE = "MISSING_SIGNATURE"
 MISSING_KEY_LOCATION = "MISSING_KEY_LOCATION"
 BAD_KEY_OWNER = "BAD_KEY_OWNER"
 
-class UnsupportedSignatureAlgorithm(Exception):
+class SignatureException(Exception):
+    def __init__(self, message=None):
+        Exception.__init__(self)
+        self.message = message
+
+
+class UnknownKeyException(SignatureException):
+    '''
+    Exception to be thrown when a key is not found in local keyring.
+    '''
+
+    def __init__(self, keyid):
+        SignatureException.__init__(self)
+        self.keyid = keyid
+
+
+class UnsupportedSignatureAlgorithm(SignatureException):
     '''
     Exception to be thrown when an unsupported method of signing is encountered.
 
@@ -55,16 +55,13 @@ class UnsupportedSignatureAlgorithm(Exception):
         self.alg = alg
 
 
-class BadSignatureFormat(Exception):
+class BadSignatureFormat(SignatureException):
     '''
     Exception to be thrown when a supported method of signing is advertised but not adhered.
     '''
+    pass
 
-    def __init__(self, message=None):
-        Exception.__init__(self)
-        self.message = message
-
-class MissingPublicKey(Exception):
+class MissingPublicKey(SignatureException):
     '''
     Exception to be raised when the public key cannot be found.
     '''

@@ -119,17 +119,9 @@ class PipeTool(object):
                 result["verified"] = False
                 result["error"] = "No available public key to validate."
 
-        except errors.BadSignatureFormat as e:
+        except errors.SignatureException as e:
             result["verified"] = False
-            result["error"] = e.message
-
-        except errors.UnknownKeyException as e:
-            result["verified"] = False
-            result["error"] = e.message
-
-        except errors.UnsupportedSignatureAlgorithm as e:
-            result["verified"] = False
-            result["error"] = e.message
+            result["error"] = "Signature exception: "+e.message
 
         except Exception as e:
             result["verified"] = False
