@@ -22,7 +22,7 @@ class UnknownKeyException(Exception):
     '''
     Exception to be thrown when a key is not found in local keyring.
     '''
-    
+
     def __init__(self, keyid):
         '''
         Constructor
@@ -37,24 +37,24 @@ BAD_KEY_OWNER = "BAD_KEY_OWNER"
 class UnsupportedSignatureAlgorithm(Exception):
     '''
     Exception to be thrown when an unsupported method of signing is encountered.
-    
+
     Params:
         alg : the algorithm encountered
     '''
-    
+
     def __init__(self, alg=None):
         '''
         Constructor
         '''
         Exception.__init__(self)
         self.alg = alg
-        
-        
+
+
 class BadSignatureFormat(Exception):
     '''
     Exception to be thrown when a supported method of signing is advertised but not adhered.
     '''
-    
+
     def __init__(self, message=None):
         Exception.__init__(self)
         self.message = message
@@ -67,3 +67,13 @@ class MissingPublicKey(Exception):
         Exception.__init__(self)
         self.message = message
         self.keyid = keyid
+
+
+class InvalidPassphrase(Exception):
+    '''
+    Exception to be raised when an invalid passphrase is provided for key
+    '''
+    def __init__(self, message=None):
+        Exception.__init__(self)
+        self.message = message
+
