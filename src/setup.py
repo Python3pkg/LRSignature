@@ -21,10 +21,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='LRSignature',
-    version='0.1.14',
+    version='0.1.15',
     author='Jim Klo',
     author_email="jim.klo@sri.com",
-    url = "https://github.com/jimklo/LRSignature",
+    url = "https://github.com/LearningRegistry/LRSignature",
     description='Learning Registry resource data digital signature management',
     packages=find_packages(),
     long_description=open('README.txt').read(),

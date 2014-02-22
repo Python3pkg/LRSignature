@@ -30,9 +30,9 @@ Installation
 2. Download the latest release from the [src/dist](./LRSignature/tree/master/src/dist)
 
 3. Install with pip
-        
+
         pip install LRSignature-<version>.tar.gz
-        
+
 4. There is no step four! Done.
 
 
@@ -44,7 +44,7 @@ Usage
     from LRSignature.sign.Sign  import Sign_0_21
     from LRSignature.verify.Verify  import Verify_0_21
     import simplejson as json
-    
+
     envelope = '''
             {
                 "_id":"00e3f67232e743b6bc2a079bd98ff55a",
@@ -79,13 +79,13 @@ Usage
 
     signtool = Sign_0_21(keyid, passphrase=passphrase, publicKeyLocations=privateKeyLocation)
     signed = signtool.sign(origJson)
-    
+
     verifytool = Verify_0_21()
     verified = verifytool.verify(signed)
     assert verified == True
-    
-    
-LRSignature.util module contains functionality to fetch and store public keys into the 
+
+
+LRSignature.util module contains functionality to fetch and store public keys into the
 local PGP keyring.
 
 
@@ -104,10 +104,15 @@ Other Python Dependencies:
 
 Versions
 ========
+0.1.15 - Bug fixes, new Sign/Verify version classes, improved exceptions
+        * Signing will now throw an exception when provided passphrase for key is invalid
+        * Provided signing key may now contain spaces
+        * Signing and verification will throw exceptions extended from a base SignatureException
+
 0.1.14 - Significant Bug Fixes:
-        
-        * Fixed signing so that it performs a "deep copy" instead of a shallow copy.  
-        * Fixed algorithm to properly drop numbers on envelope before passing to bencode.  
+
+        * Fixed signing so that it performs a "deep copy" instead of a shallow copy.
+        * Fixed algorithm to properly drop numbers on envelope before passing to bencode.
 
         Other: Made testsuite work with Jenkins continuous integration.
 
@@ -116,7 +121,7 @@ Versions
 0.1.12 - No changes; modified dependency version number for python-gnupgp
 
 0.1.11 - New Features and Bug Fixes:
-        
+
         * _NEW_ Added a feature to signing to skip signing envelopes with a doc_version older that 0.21.0.
 
         * Fixed a problem with signature validation due to changes in gnupg.
@@ -134,13 +139,13 @@ Versions
 0.1.6 - New Feature.
 
         * Enhanced command line usage.
-            
+
             - Added envelope signature validation
-            
+
             - Command line arguments modified to have modes, sign & verify
 
-0.1.4 - Minor enhancement. 
-        
+0.1.4 - Minor enhancement.
+
         * Updated __init__.py files to import the right submodules
           so package visibility is not obfuscated. No functionality changes.
 
@@ -148,23 +153,23 @@ Versions
 
         * Bittorrent-python does not encode unicode strings.  Repackaged LRSignature
           with modified Bittorrent-python package which can handle UTF-8 strings.
-        
+
         * License for Bittorrent-python code is [Bittorrent Open Source License](http://www2.bittorrent.com/legal/bittorrent-open-source-license)
-        
+
         * Removed external dependency for Bittorrent-python module.
-        
+
         * Reverted changes from 0.1.2.
 
 0.1.2 - Bug Fix [PT #14231273](https://www.pivotaltracker.com/story/show/14231273)
 
         * UTF-8 encoded envelopes failed to sign.
-         
+
             - Unicode strings are now UTF-8 encoded before bencoding.
-        
-            
+
+
 0.1.1 - Minor Bug Fix
 
         * When gnupgHome is not defined, default option creates a directory named "~".
-        
-        
+
+
 0.1.0 - Initial Release
