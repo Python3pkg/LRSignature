@@ -127,6 +127,9 @@ except ImportError:
     pass
 
 def bencode(x):
-    r = []
-    encode_func[type(x)](x, r)
-    return ''.join(r)
+    try:
+        r = []
+        encode_func[type(x)](x, r)
+        return ''.join(r)
+    except (IndexError, KeyError, ValueError):
+        raise BTFailure("not a valid type to encode: %s" % type(x))
