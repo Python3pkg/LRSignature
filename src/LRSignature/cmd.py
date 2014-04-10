@@ -54,6 +54,9 @@ class PipeTool(object):
             resultList = self.validateEnvelopes(envelopeList)
             print json.dumps({"results": resultList})
 
+        elif self.args.mode == "publish":
+            self.publishEnvelopes(envelopeList)
+
 
 
 
@@ -181,6 +184,17 @@ class PipeTool(object):
         verify_parser.set_defaults(mode="verify")
         verify_parser.add_argument('--gpgbin', help='Path to GPG binary')
         verify_parser.add_argument('--gnupghome', help='Path to GPG home directory')
+
+        publish_parser = subparsers.add_parser('publish')
+        publish_parser.set_defaults(mode="publish")
+        publish_parser.add_argument('--lr-test-data', help='Publish as lr test data, default is True', default="True")
+        publish_parser.add_argument('--publish-url', help='URL of publish service on node to send envelopes, default STDOUT', default=None)
+        publish_parser.add_argument('--publish-chunksize', help='publish chunksize, default 25', type=int, default=25)
+        publish_parser.add_argument('--publish-timeout', help='publish timeout in seconds, default 300', type=int, default=300)
+        publish_parser.add_argument('--publish-username', help='publish userame for basic HTTP auth', default=None)
+        publish_parser.add_argument('--publish-password', help='publish password for basic HTTP auth', default=None)
+        publish_parser.add_argument('--gpgbin', help='Path to GPG binary')
+        publish_parser.add_argument('--gnupghome', help='Path to GPG home directory')
 
         parser.add_argument('--gpgbin', help='Path to GPG binary', default="gpg")
         parser.add_argument('--gnupghome', help='Path to GPG home directory', default="~/.gnupg")

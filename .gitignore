@@ -2,5 +2,6 @@
 /.project
 /.pydevproject
 *.pyc
+*.sublime-*
 /src/LRSignature/tests/.DS_Store
 /src/LRSignature.egg-info
