@@ -40,4 +40,4 @@ Other Python Dependencies:
 Versions
 ========
 
-[See README.txt](https://github.com/jimklo/LRSignature/tree/master/src "See README.txt")
+[See README.txt](./LRSignature/README.txt "See README.txt")

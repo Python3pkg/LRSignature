@@ -105,6 +105,7 @@ Other Python Dependencies:
 Versions
 ========
 0.1.15 - Bug fixes, new Sign/Verify version classes, improved exceptions
+
         * Signing will now throw an exception when provided passphrase for key is invalid
         * Provided signing key may now contain spaces
         * Signing and verification will throw exceptions extended from a base SignatureException
