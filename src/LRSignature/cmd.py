@@ -110,7 +110,7 @@ class PipeTool(object):
             for location in locations:
                 rawKeys = util.fetchkeys(location)
                 for rawKey in rawKeys:
-                    numImported += util.storekey(self.sampleKey, gpgbin=self.args.gpgbin, gnupgHome=self.args.gnupghome)
+                    numImported += util.storekey(rawKey, gpgbin=self.args.gpgbin, gnupgHome=self.args.gnupghome)
                 if numImported > 0:
                     break
 

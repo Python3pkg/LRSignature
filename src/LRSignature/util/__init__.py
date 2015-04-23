@@ -31,19 +31,19 @@ def fetchkeys(url):
 
     req = urllib2.Request(url)
     res = urllib2.urlopen(req)
-    
+
     response = res.read()
-    
+
     obj = re.finditer("((?!<.*)(-----BEGIN PGP PUBLIC KEY BLOCK-----(\\r)?\\n[^-]+-----END PGP PUBLIC KEY BLOCK-----))+", response, re.MULTILINE | re.DOTALL)
-    
+
     rawKeys = []
     for o in obj:
         rawKeys.append(response[o.start():o.end()])
     return rawKeys
 
-def storekey(keydata, gnupghome=os.path.expanduser(os.path.join("~", ".gnupg")), gpgbin="/usr/local/bin/gpg"):
-    gpg = gnupg.GPG(gpgbinary=gpgbin, gnupghome=gnupghome)
-    
+def storekey(keydata, gnupgHome=os.path.expanduser(os.path.join("~", ".gnupg")), gpgbin="/usr/local/bin/gpg"):
+    gpg = gnupg.GPG(gpgbinary=gpgbin, gnupghome=gnupgHome)
+
     result = gpg.import_keys(keydata)
     return result.imported
 
@@ -52,9 +52,8 @@ if __name__ == "__main__":
     keyURLs = ["http://pool.sks-keyservers.net:11371/pks/lookup?op=get&search=0xA8A790EA220403B7",
               "http://sites.google.com/site/learningregistrytestdata/home/multiple-public-pgp-keys"]
     for url in keyURLs:
-        
+
         keys = fetchkeys(url)
         print "Key count: {0}; URL:{1}".format(len(keys),url)
         for key in keys:
             print key
-    
