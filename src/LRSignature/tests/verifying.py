@@ -77,11 +77,11 @@ class Test(unittest.TestCase):
         if os.path.exists(configFile):
             config = json.load(file(configFile))
             
-            if config.has_key("global"):
-                if config["global"].has_key("testdata") and os.path.exists(config["global"]["testdata"]):
+            if "global" in config:
+                if "testdata" in config["global"] and os.path.exists(config["global"]["testdata"]):
                     self.testDataDir = config["global"]["testdata"]
 
-                if config["global"].has_key("testdata_unicode") and os.path.exists(config["global"]["testdata_unicode"]):
+                if "testdata_unicode" in config["global"] and os.path.exists(config["global"]["testdata_unicode"]):
                     self.testDataUnicode = config["global"]["testdata_unicode"]
         
         unittest.TestCase.__init__(self, methodName)
@@ -147,13 +147,13 @@ class Test(unittest.TestCase):
         
         assert sigInfo != None, "signature extraction from envelope failed"
         
-        assert sigInfo.has_key("signing_method") and sigInfo["signing_method"] == verifytool.signatureMethod, "signing_method is missing from signature block"
+        assert "signing_method" in sigInfo and sigInfo["signing_method"] == verifytool.signatureMethod, "signing_method is missing from signature block"
         
-        assert sigInfo.has_key("signature") and sigInfo["signature"] != None and len(sigInfo["signature"]) > 0, "signature field is missing, null or is empty"
+        assert "signature" in sigInfo and sigInfo["signature"] != None and len(sigInfo["signature"]) > 0, "signature field is missing, null or is empty"
         
-        assert sigInfo.has_key("key_location") and sigInfo["key_location"] == self.sampleKeyLocations, "key_location field is not correct"
+        assert "key_location" in sigInfo and sigInfo["key_location"] == self.sampleKeyLocations, "key_location field is not correct"
         
-        assert sigInfo.has_key("key_owner") and sigInfo["key_owner"] == signtool._get_privatekey_owner(), "key_owner field does not match signing key"
+        assert "key_owner" in sigInfo and sigInfo["key_owner"] == signtool._get_privatekey_owner(), "key_owner field does not match signing key"
 
     def testBadSignatureBlockMissingLocation(self):
         '''Check that signature block validation correctly checks for missing key_location field'''
@@ -363,7 +363,7 @@ class Test(unittest.TestCase):
                 
                 signed = signtool.sign(unsigned)
                 
-                assert signed.has_key("digital_signature"), "missing digital_signature"
+                assert "digital_signature" in signed, "missing digital_signature"
                 
                 verified = verifytool.verify(signed)
                 assert verified == True, "baseline validation failed"

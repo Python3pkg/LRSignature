@@ -49,11 +49,11 @@ class Test(unittest.TestCase):
         if os.path.exists(configFile):
             config = json.load(file(configFile))
 
-            if config.has_key("global"):
-                if config["global"].has_key("testdata") and os.path.exists(config["global"]["testdata"]):
+            if "global" in config:
+                if "testdata" in config["global"] and os.path.exists(config["global"]["testdata"]):
                     self.testDataDir = config["global"]["testdata"]
 
-                if config["global"].has_key("testdata_unicode") and os.path.exists(config["global"]["testdata_unicode"]):
+                if "testdata_unicode" in config["global"] and os.path.exists(config["global"]["testdata_unicode"]):
                     self.testDataUnicode = config["global"]["testdata_unicode"]
 
 
@@ -470,7 +470,7 @@ class Test(unittest.TestCase):
         arbitrarySigdata = "ABCDEF0123456789-abcdef"
         arbitraryKeyLoc = self.sampleKeyLocations
 
-        keyloc = ",".join(map(lambda x: '"{0}"'.format(x), arbitraryKeyLoc))
+        keyloc = ",".join(['"{0}"'.format(x) for x in arbitraryKeyLoc])
         benchmark = json.loads(self.signatureTemplate.format(keyloc, arbitrarySigdata))
 
         signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
@@ -487,7 +487,7 @@ class Test(unittest.TestCase):
         signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
         assert origJson["resource_data"]["nullable"] == None, "Expected null"
         assert origJson["resource_data"]["booleanT"] == True, "Expected true"
         assert origJson["resource_data"]["booleanF"] == False, "Expected false"
@@ -499,10 +499,10 @@ class Test(unittest.TestCase):
         signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
 
         sig = signed["digital_signature"]
-        assert sig.has_key("signature")
+        assert "signature" in sig
         assert sig["signature"] != None and len(sig["signature"]) > 0
 
     def test_Sign__0_10__passthru(self):
@@ -512,7 +512,7 @@ class Test(unittest.TestCase):
         signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, sign_everything=False, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert not signed.has_key("digital_signature")
+        assert "digital_signature" not in signed
 
         # sig = signed["digital_signature"]
         # assert sig.has_key("signature")
@@ -525,9 +525,9 @@ class Test(unittest.TestCase):
         signer = Sign_0_23(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, sign_everything=False, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
         sig = signed["digital_signature"]
-        assert sig.has_key("signature")
+        assert "signature" in sig
         assert sig["signature"] != None and len(sig["signature"]) > 0
 
     def test_Sign__0_23__no_passthru(self):
@@ -537,9 +537,9 @@ class Test(unittest.TestCase):
         signer = Sign_0_23(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, sign_everything=True, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
         sig = signed["digital_signature"]
-        assert sig.has_key("signature")
+        assert "signature" in sig
         assert sig["signature"] != None and len(sig["signature"]) > 0
 
     def test_Sign__0_51__no_passthru(self):
@@ -549,9 +549,9 @@ class Test(unittest.TestCase):
         signer = Sign_0_51(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, sign_everything=True, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(origJson)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
         sig = signed["digital_signature"]
-        assert sig.has_key("signature")
+        assert "signature" in sig
         assert sig["signature"] != None and len(sig["signature"]) > 0
 
     def testSignUnicode(self):
@@ -570,10 +570,10 @@ class Test(unittest.TestCase):
         signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
         signed = signer.sign(unsigned)
 
-        assert signed.has_key("digital_signature")
+        assert "digital_signature" in signed
 
         sig = signed["digital_signature"]
-        assert sig.has_key("signature")
+        assert "signature" in sig
         assert sig["signature"] != None and len(sig["signature"]) > 0
 
     def testSignLRTestData(self):
@@ -595,10 +595,10 @@ class Test(unittest.TestCase):
                 signer = Sign_0_21(self.goodkeyid, passphrase=self.goodpassphrase, publicKeyLocations=arbitraryKeyLoc, gnupgHome=self.gnupgHome, gpgbin=self.gpgbin)
                 signed = signer.sign(unsigned)
 
-                assert signed.has_key("digital_signature")
+                assert "digital_signature" in signed
 
                 sig = signed["digital_signature"]
-                assert sig.has_key("signature")
+                assert "signature" in sig
                 assert sig["signature"] != None and len(sig["signature"]) > 0
 
 

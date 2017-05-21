@@ -21,13 +21,12 @@ from gnupg import GPG
 from ..sign.Sign import *
 from ..errors import *
 import types, re, copy, os, sys
-import cStringIO
+import io
 
 from abc import ABCMeta
 
 
-class VerifyBase(SignBase):
-    __metaclass__ = ABCMeta
+class VerifyBase(SignBase, metaclass=ABCMeta):
     '''
     Base class for verifying signatures
     '''
@@ -44,15 +43,15 @@ class VerifyBase(SignBase):
     def _getSignatureInfo(self, envelope={}):
             sigInfo = None
 
-            if envelope.has_key("digital_signature"):
+            if "digital_signature" in envelope:
                 sigInfo = envelope["digital_signature"]
-                if sigInfo.has_key("signing_method"):
+                if "signing_method" in sigInfo:
                     if sigInfo["signing_method"] == self.signatureMethod:
-                        if not sigInfo.has_key("signature") or sigInfo["signature"] == None or len(sigInfo["signature"]) == 0:
+                        if "signature" not in sigInfo or sigInfo["signature"] == None or len(sigInfo["signature"]) == 0:
                             raise BadSignatureFormat(MISSING_SIGNATURE)
-                        elif not (sigInfo.has_key("key_location") and isinstance(sigInfo["key_location"], types.ListType) and len(sigInfo["key_location"]) > 0 ):
+                        elif not ("key_location" in sigInfo and isinstance(sigInfo["key_location"], list) and len(sigInfo["key_location"]) > 0 ):
                             raise BadSignatureFormat(MISSING_KEY_LOCATION)
-                        elif sigInfo.has_key("key_owner") and not isinstance(sigInfo["key_owner"], types.StringTypes):
+                        elif "key_owner" in sigInfo and not isinstance(sigInfo["key_owner"], str):
                             raise BadSignatureFormat(BAD_KEY_OWNER)
                     else:
                         raise UnsupportedSignatureAlgorithm(sigInfo["signing_method"])

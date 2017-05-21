@@ -83,20 +83,20 @@ class SignBase(object):
         return True
 
     def _bnormal(self, obj = {}):
-            if isinstance(obj, types.NoneType):
+            if isinstance(obj, type(None)):
                 return "null"
             # Boolean needs to be checked before numeric types as Booleans are also IntType
-            elif isinstance(obj, types.BooleanType):
+            elif isinstance(obj, bool):
                 return str(obj).lower()
-            elif isinstance(obj, (types.FloatType, types.IntType, types.LongType, types.ComplexType)):
-                print "Dropping number: {0}\n".format(obj)
+            elif isinstance(obj, (float, int, complex)):
+                print("Dropping number: {0}\n".format(obj))
                 raise TypeError("Numbers not permitted")
                 # return str(obj)
-            elif isinstance(obj, types.StringType):
+            elif isinstance(obj, bytes):
                 return obj
-            elif isinstance(obj, types.UnicodeType):
+            elif isinstance(obj, str):
                 return obj
-            elif isinstance(obj, types.ListType):
+            elif isinstance(obj, list):
                 nobj = []
                 for child in obj:
                     try:
@@ -104,8 +104,8 @@ class SignBase(object):
                     except TypeError:
                         pass
                 return nobj
-            elif isinstance(obj, types.DictType):
-                for key in obj.keys():
+            elif isinstance(obj, dict):
+                for key in list(obj.keys()):
                     try:
                         obj[key] = self._bnormal(obj[key])
                     except TypeError:
@@ -118,7 +118,7 @@ class SignBase(object):
         fields = ["digital_signature", "publishing_node", "update_timestamp", "node_timestamp", "create_timestamp", "doc_ID", "_id", "_rev"]
         sigObj = copy.deepcopy(envelope)
         for field in fields:
-            if sigObj.has_key(field):
+            if field in sigObj:
                 del sigObj[field]
         return sigObj
 
@@ -154,7 +154,7 @@ class SignBase(object):
         return hashedDigest
 
     def _get_privatekey_owner(self):
-        if self.privateKeyInfo.has_key("uids") and isinstance(self.privateKeyInfo["uids"], types.ListType):
+        if "uids" in self.privateKeyInfo and isinstance(self.privateKeyInfo["uids"], list):
             return ", ".join(self.privateKeyInfo["uids"])
 
         return None

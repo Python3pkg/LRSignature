@@ -14,6 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
-import bencode, sign, tests, util, verify, errors
+from . import bencode, sign, tests, util, verify, errors
 
 __all__ = ["bencode", "sign", "tests", "util", "verify", "publish", "errors", "cmd"]

@@ -22,8 +22,8 @@ class PipeTool(object):
 
 
     def run(self):
-        from sign.Sign import Sign_0_21 as Signer
-        from verify.Verify import Verify_0_21 as Verifier
+        from .sign.Sign import Sign_0_21 as Signer
+        from .verify.Verify import Verify_0_21 as Verifier
 
         import json
 
@@ -47,12 +47,12 @@ class PipeTool(object):
             if self.args.publish_url != None:
                 self.publishEnvelopes(signedList)
             else:
-                print json.dumps({ "documents": signedList })
+                print(json.dumps({ "documents": signedList }))
 
         elif self.args.mode == "verify":
             self.verifytool = Verifier(gpgbin=self.args.gpgbin, gnupgHome=self.args.gnupghome)
             resultList = self.validateEnvelopes(envelopeList)
-            print json.dumps({"results": resultList})
+            print(json.dumps({"results": resultList}))
 
         elif self.args.mode == "publish":
             self.publishEnvelopes(envelopeList)
@@ -63,7 +63,7 @@ class PipeTool(object):
     def _set_test_key(self, envelope, remove=True):
         rmcount = 0
 
-        if envelope.has_key("keys"):
+        if "keys" in envelope:
             for item in envelope["keys"]:
                 if item == "lr-test-data":
                     rmcount += 1
@@ -95,9 +95,9 @@ class PipeTool(object):
 
         result = {}
         result = {"verified": False}
-        if doc.has_key("doc_ID"):
+        if "doc_ID" in doc:
             result["doc_ID"] = doc["doc_ID"]
-        if doc.has_key("resource_locator"):
+        if "resource_locator" in doc:
             result["resource_locator"] = doc["resource_locator"]
 
         try:
@@ -140,18 +140,18 @@ class PipeTool(object):
 
 
     def publishEnvelopes(self, envelopes):
-        import urllib2,json
-        req = urllib2.Request(self.args.publish_url, headers={"Content-type": "application/json; charset=utf-8"})
+        import urllib.request, urllib.error, urllib.parse,json
+        req = urllib.request.Request(self.args.publish_url, headers={"Content-type": "application/json; charset=utf-8"})
         if self.args.publish_username and self.args.publish_password:
             import base64
             base64string = base64.encodestring('%s:%s' % (self.args.publish_username, self.args.publish_password))[:-1]
             req.add_header("Authorization", "Basic %s" % base64string)
         status = []
         for chunk in self._chunkList(envelopes, self.args.publish_chunksize):
-            res = urllib2.urlopen(req, data=json.dumps({ "documents":chunk }), timeout=self.args.publish_timeout)
+            res = urllib.request.urlopen(req, data=json.dumps({ "documents":chunk }), timeout=self.args.publish_timeout)
             status.append(json.load(res))
 
-        print json.dumps(status)
+        print(json.dumps(status))
 
     def signEnvelopes(self, envelopes, is_test_data=True):
         signedEnvelopes = []
@@ -240,14 +240,14 @@ class PipeTool(object):
                 records = getHarvestRecords(jsobject)
                 if records != None:
                     return records
-                if isinstance(jsobject, types.DictionaryType):
-                    if jsobject.has_key("documents") and isinstance(jsobject["documents"], types.ListType):
+                if isinstance(jsobject, dict):
+                    if "documents" in jsobject and isinstance(jsobject["documents"], list):
                         return jsobject["documents"]
                     return [jsobject]
-                elif isinstance(jsobject, types.ListType):
+                elif isinstance(jsobject, list):
                     return jsobject
 
-            except Exception, e:
+            except Exception as e:
                 raise InvalidJSONError(e.message)
         return None
 
@@ -258,7 +258,7 @@ class PipeTool(object):
         pipedInput = ''
         try:
             while True:
-                pipedInput += raw_input()
+                pipedInput += input()
 
         except EOFError:
             pass

@@ -18,7 +18,7 @@ Created on Apr 27, 2011
 @author: jklo
 '''
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 import gnupg
 import os
@@ -29,8 +29,8 @@ def fetchkeys(url):
     Fetches one or more PGP public key from URL
     '''
 
-    req = urllib2.Request(url)
-    res = urllib2.urlopen(req)
+    req = urllib.request.Request(url)
+    res = urllib.request.urlopen(req)
     
     response = res.read()
     
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     for url in keyURLs:
         
         keys = fetchkeys(url)
-        print "Key count: {0}; URL:{1}".format(len(keys),url)
+        print("Key count: {0}; URL:{1}".format(len(keys),url))
         for key in keys:
-            print key
+            print(key)
     

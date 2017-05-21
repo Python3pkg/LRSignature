@@ -103,7 +103,7 @@ def encode_list(x, r):
 
 def encode_dict(x,r):
     r.append('d')
-    ilist = x.items()
+    ilist = list(x.items())
     ilist.sort()
     for k, v in ilist:
         r.extend((str(len(k)), ':', k))
@@ -115,7 +115,7 @@ encode_func[Bencached] = encode_bencached
 encode_func[IntType] = encode_int
 encode_func[LongType] = encode_int
 encode_func[StringType] = encode_string
-encode_func[unicode] = encode_string
+encode_func[str] = encode_string
 encode_func[ListType] = encode_list
 encode_func[TupleType] = encode_list
 encode_func[DictType] = encode_dict
